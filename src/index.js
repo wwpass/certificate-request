@@ -1,18 +1,26 @@
 import * as asn1js from 'asn1js';
 import { version } from '../package.json';
 
+const OID_COUNTRY_NAME = "2.5.4.6";
+const OID_STATE_OR_PROVINCE_NAME = "2.5.4.8";
+const OID_LOCALITY_NAME = "2.5.4.7";
+const OID_ORGANIZATION_NAME = "2.5.4.10";
+const OID_ORGANIZATIONAL_UNIT_NAME = "2.5.4.11";
+const OID_COMMON_NAME = "2.5.4.3";
+const OID_EMAIL_ADDRESS = "1.2.840.113549.1.9.1";
+
 if ('console' in window && window.console.log) {
   window.console.log(`WWPass frontend library version ${version}`);
   window.console.log('Integer', asn1js.Integer);
   window.console.log(asn1js);
   let companyData = {
-    commonName: "*.wikipedia.org",
-    organizationName: "Wikimedia Foundation, Inc.",
-    organizationalUnitName: "Finance",
-    localityName: "San Francisco",
-    stateOrProvinceName: "California",
-    countryName: "US",
-    emailAddress: "none.none@wikipedia.org"
+    [OID_COMMON_NAME]: "*.wikipedia.org",
+    [OID_ORGANIZATION_NAME]: "Wikimedia Foundation, Inc.",
+    [OID_ORGANIZATIONAL_UNIT_NAME]: "Finance",
+    [OID_LOCALITY_NAME]: "San Francisco",
+    [OID_STATE_OR_PROVINCE_NAME]: "California",
+    [OID_COUNTRY_NAME]: "US",
+    [OID_EMAIL_ADDRESS]: "none.none@wikipedia.org"
   };
   generatePEMs(companyData).then(result => {
     addToPage(result.CSR_PEM);
@@ -26,83 +34,42 @@ function encodePem(data, label) {
   return `-----BEGIN ${label}-----\n${encodedData}\n-----END ${label}-----`;
 }
 
-function encodeCSR(pubKey, privKey, companyData){
-  return new Promise(resolve => {
-    let name = new asn1js.Sequence({
+function composeName(companyData){
+  const attrubuteType = {
+    [OID_COUNTRY_NAME]: asn1js.PrintableString,
+    [OID_STATE_OR_PROVINCE_NAME]: asn1js.Utf8String,
+    [OID_LOCALITY_NAME]: asn1js.Utf8String,
+    [OID_ORGANIZATION_NAME]: asn1js.Utf8String,
+    [OID_ORGANIZATIONAL_UNIT_NAME]: asn1js.Utf8String,
+    [OID_COMMON_NAME]: asn1js.Utf8String,
+    [OID_EMAIL_ADDRESS]: asn1js.IA5String
+  };
+  const oids = [
+    OID_COUNTRY_NAME,
+    OID_STATE_OR_PROVINCE_NAME,
+    OID_LOCALITY_NAME,
+    OID_ORGANIZATION_NAME,
+    OID_ORGANIZATIONAL_UNIT_NAME,
+    OID_COMMON_NAME,
+    OID_EMAIL_ADDRESS
+  ];
+  const attributesArr = oids.map(oid => {
+    return new asn1js.Set({
       value: [
-        new asn1js.Set({
+        new asn1js.Sequence({
           value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.6" }),
-                new asn1js.PrintableString({ value: companyData.countryName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.8" }),
-                new asn1js.Utf8String({ value: companyData.stateOrProvinceName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.7" }),
-                new asn1js.Utf8String({ value: companyData.localityName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.10" }),
-                new asn1js.Utf8String({ value: companyData.organizationName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.11" }),
-                new asn1js.Utf8String({ value: companyData.organizationalUnitName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "2.5.4.3" }),
-                new asn1js.Utf8String({ value: companyData.commonName })
-              ]
-            })
-          ]
-        }),
-        new asn1js.Set({
-          value: [
-            new asn1js.Sequence({
-              value: [
-                new asn1js.ObjectIdentifier({ value: "1.2.840.113549.1.9.1" }),
-                new asn1js.IA5String({ value: companyData.emailAddress })
-              ]
-            })
+            new asn1js.ObjectIdentifier({ value: oid }),
+            new attrubuteType[oid]({ value: companyData[oid] })
           ]
         })
       ]
     });
+  });
+  return new asn1js.Sequence({ value: attributesArr});
+}
 
+function encodeCSR(pubKey, privKey, companyData){
+  return new Promise(resolve => {
     crypto.subtle.exportKey("spki", pubKey).then(spkiBin => {
       let SubjectPublicKeyInfo = asn1js.fromBER(spkiBin).result;
       let zeroTagBuf = new Uint8Array([0xa0, 0x00]); //empty constructed context-specific class with tag 0
@@ -110,7 +77,7 @@ function encodeCSR(pubKey, privKey, companyData){
       let CertificationRequestInfo = new asn1js.Sequence({
         value: [
           new asn1js.Integer({ value: 0 }),
-          name,
+          composeName(companyData),
           SubjectPublicKeyInfo,
           zeroTag
         ]
