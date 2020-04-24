@@ -25,16 +25,7 @@ function composeName(companyData){
     [OID_COMMON_NAME]: asn1js.Utf8String,
     [OID_EMAIL_ADDRESS]: asn1js.IA5String
   };
-  const oids = [
-    OID_COUNTRY_NAME,
-    OID_STATE_OR_PROVINCE_NAME,
-    OID_LOCALITY_NAME,
-    OID_ORGANIZATION_NAME,
-    OID_ORGANIZATIONAL_UNIT_NAME,
-    OID_COMMON_NAME,
-    OID_EMAIL_ADDRESS
-  ];
-  const attributesArr = oids.map(oid => {
+  const attributesArr = Object.keys(companyData).map(oid => {
     return new asn1js.Set({
       value: [
         new asn1js.Sequence({
