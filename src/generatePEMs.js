@@ -43,10 +43,10 @@ function composeName(companyData){
 function encodeCSR(pubKey, privKey, companyData){
   return new Promise(resolve => {
     crypto.subtle.exportKey("spki", pubKey).then(spkiBin => {
-      let SubjectPublicKeyInfo = asn1js.fromBER(spkiBin).result;
+      const SubjectPublicKeyInfo = asn1js.fromBER(spkiBin).result;
       let zeroTagBuf = new Uint8Array([0xa0, 0x00]); //empty constructed context-specific class with tag 0
       let zeroTag = asn1js.fromBER(zeroTagBuf.buffer).result;
-      let CertificationRequestInfo = new asn1js.Sequence({
+      const CertificationRequestInfo = new asn1js.Sequence({
         value: [
           new asn1js.Integer({ value: 0 }),
           composeName(companyData),
@@ -55,7 +55,7 @@ function encodeCSR(pubKey, privKey, companyData){
         ]
       });
 
-      let algorithm = new asn1js.Sequence({
+      const algorithm = new asn1js.Sequence({
         value: [
           new asn1js.ObjectIdentifier({ value: "1.2.840.113549.1.1.13" }),
           new asn1js.Null()
@@ -63,7 +63,7 @@ function encodeCSR(pubKey, privKey, companyData){
       });
 
       crypto.subtle.sign("RSASSA-PKCS1-v1_5", privKey, CertificationRequestInfo.toBER(false)).then(Signature => {
-        let CertificationRequest = new asn1js.Sequence({
+        const CertificationRequest = new asn1js.Sequence({
           value: [
             CertificationRequestInfo,
             algorithm,
@@ -87,7 +87,7 @@ export function generatePrivateKeyAndCSR(companyData) {
   return new Promise(resolve => {
     crypto.subtle.generateKey(keyGenParams, true, keyUsages).then(keyPair => {
       crypto.subtle.exportKey("pkcs8", keyPair.privateKey).then(privKeyBuf => {
-        let  privateKeyPEM = encodePem(privKeyBuf, "PRIVATE KEY");
+        const  privateKeyPEM = encodePem(privKeyBuf, "PRIVATE KEY");
         encodeCSR(keyPair.publicKey, keyPair.privateKey, companyData).then(CSR_PEM => {
           resolve({
             CSR_PEM: CSR_PEM,
