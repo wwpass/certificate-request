@@ -8,7 +8,13 @@ import {
   OID_ORGANIZATION_NAME,
   OID_ORGANIZATIONAL_UNIT_NAME,
   OID_COMMON_NAME,
-  OID_EMAIL_ADDRESS
+  OID_EMAIL_ADDRESS,
+  OID_UNSTRUCTURED_NAME,
+  OID_CHALLENGE_PASSWORD,
+  OID_EXTENSION_REQUEST,
+  EXTN_ID,
+  CRITICAL,
+  EXTN_VALUE
 } from "./generatePEMs"
 
 if ('console' in window && window.console.log) {
@@ -22,7 +28,21 @@ if ('console' in window && window.console.log) {
     [OID_LOCALITY_NAME]: "San Francisco",
     [OID_STATE_OR_PROVINCE_NAME]: "California",
     [OID_COUNTRY_NAME]: "US",
-    [OID_EMAIL_ADDRESS]: "none.none@wikipedia.org"
+    [OID_EMAIL_ADDRESS]: "none.none@wikipedia.org",
+    [OID_EXTENSION_REQUEST]: [
+      {
+        [EXTN_ID]: "2.5.29.36",
+        [CRITICAL]: false,
+        [EXTN_VALUE]: new Uint8Array([48, 6, 2, 1, 1, 2, 1, 2]).buffer
+      },
+      {
+        [EXTN_ID]: "2.5.29.19",
+        [CRITICAL]: false,
+        [EXTN_VALUE]: new Uint8Array([48, 6, 1, 1, 0, 2, 1, 0]).buffer
+      }
+    ],
+    [OID_CHALLENGE_PASSWORD]: "qwerty",
+    [OID_UNSTRUCTURED_NAME]: "Some Name"
   };
   generatePrivateKeyAndCSR(companyData).then(result => {
     addToPage(result.CSR_PEM);
