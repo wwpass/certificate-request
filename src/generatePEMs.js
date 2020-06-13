@@ -1,22 +1,40 @@
 import * as asn1js from 'asn1js';
-import { version } from '../package.json';
 
-export const OID_COUNTRY_NAME = '2.5.4.6';
-export const OID_STATE_OR_PROVINCE_NAME = '2.5.4.8';
-export const OID_LOCALITY_NAME = '2.5.4.7';
-export const OID_ORGANIZATION_NAME = '2.5.4.10';
-export const OID_ORGANIZATIONAL_UNIT_NAME = '2.5.4.11';
-export const OID_COMMON_NAME = '2.5.4.3';
+const OID_COUNTRY_NAME = '2.5.4.6';
+const OID_STATE_OR_PROVINCE_NAME = '2.5.4.8';
+const OID_LOCALITY_NAME = '2.5.4.7';
+const OID_ORGANIZATION_NAME = '2.5.4.10';
+const OID_ORGANIZATIONAL_UNIT_NAME = '2.5.4.11';
+const OID_COMMON_NAME = '2.5.4.3';
 const pkcs9 = '1.2.840.113549.1.9.';
-export const OID_EMAIL_ADDRESS = `${pkcs9}1`;
+const OID_EMAIL_ADDRESS = `${pkcs9}1`;
 
-export const OID_UNSTRUCTURED_NAME = `${pkcs9}2`;
-export const OID_CHALLENGE_PASSWORD = `${pkcs9}7`;
-export const OID_EXTENSION_REQUEST = `${pkcs9}14`;
+const OID_UNSTRUCTURED_NAME = `${pkcs9}2`;
+const OID_CHALLENGE_PASSWORD = `${pkcs9}7`;
+const OID_EXTENSION_REQUEST = `${pkcs9}14`;
 
-export const EXTN_ID = 'extnId';
-export const CRITICAL = 'criticald';
-export const EXTN_VALUE = 'extnValue';
+export const OID = {
+  OID_COUNTRY_NAME,
+  OID_STATE_OR_PROVINCE_NAME,
+  OID_LOCALITY_NAME,
+  OID_ORGANIZATION_NAME,
+  OID_ORGANIZATIONAL_UNIT_NAME,
+  OID_COMMON_NAME,
+  OID_EMAIL_ADDRESS,
+  OID_UNSTRUCTURED_NAME,
+  OID_CHALLENGE_PASSWORD,
+  OID_EXTENSION_REQUEST
+};
+
+const EXTN_ID = 'extnId';
+const CRITICAL = 'criticald';
+const EXTN_VALUE = 'extnValue';
+
+export const EXTN_LABELS = {
+  EXTN_ID,
+  CRITICAL,
+  EXTN_VALUE
+};
 
 function encodePem(data, label) {
   const stringData = String.fromCharCode.apply(null, new Uint8Array(data));
