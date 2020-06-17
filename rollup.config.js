@@ -8,7 +8,7 @@ export default [{
   output: {
     sourcemap: true,
     format: 'iife',
-    file: 'dist/manage-generate-request.js',
+    file: 'dist/certificate-request.js',
   },
   treeshake: true,
   plugins: [

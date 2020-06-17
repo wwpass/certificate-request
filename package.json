@@ -1,5 +1,5 @@
 {
-  "name": "manage-generate-request",
+  "name": "certificate-request",
   "license": "MIT",
   "version": "1.0.0",
   "description": "WWPass Frontend Request Library",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wwpass/manage-generate-request.git"
+    "url": "git+https://github.com/wwpass/certificate-request.git"
   },
   "keywords": [],
   "author": "WWPass",
@@ -48,7 +48,7 @@
   },
   "size-limit": [
     {
-      "path": "./dist/manage-generate-request.js",
+      "path": "./dist/certificate-request.js",
       "limit": "18 Kb"
     }
   ],
