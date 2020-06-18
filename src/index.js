@@ -2,7 +2,7 @@ import { version } from '../package.json';
 import {
   generatePrivateKeyAndCSR,
   OID,
-  EXTN_LABELS
+  EXTN
 } from './generatePEMs';
 
 if ('console' in window && window.console.log) {
@@ -12,5 +12,5 @@ if ('console' in window && window.console.log) {
 window.PEM = {
   generate: generatePrivateKeyAndCSR,
   OID,
-  EXTN_LABELS
+  EXTN
 };

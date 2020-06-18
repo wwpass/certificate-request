@@ -1,39 +1,24 @@
 import * as asn1js from 'asn1js';
 
-const OID_COUNTRY_NAME = '2.5.4.6';
-const OID_STATE_OR_PROVINCE_NAME = '2.5.4.8';
-const OID_LOCALITY_NAME = '2.5.4.7';
-const OID_ORGANIZATION_NAME = '2.5.4.10';
-const OID_ORGANIZATIONAL_UNIT_NAME = '2.5.4.11';
-const OID_COMMON_NAME = '2.5.4.3';
 const pkcs9 = '1.2.840.113549.1.9.';
-const OID_EMAIL_ADDRESS = `${pkcs9}1`;
-
-const OID_UNSTRUCTURED_NAME = `${pkcs9}2`;
-const OID_CHALLENGE_PASSWORD = `${pkcs9}7`;
-const OID_EXTENSION_REQUEST = `${pkcs9}14`;
 
 export const OID = {
-  OID_COUNTRY_NAME,
-  OID_STATE_OR_PROVINCE_NAME,
-  OID_LOCALITY_NAME,
-  OID_ORGANIZATION_NAME,
-  OID_ORGANIZATIONAL_UNIT_NAME,
-  OID_COMMON_NAME,
-  OID_EMAIL_ADDRESS,
-  OID_UNSTRUCTURED_NAME,
-  OID_CHALLENGE_PASSWORD,
-  OID_EXTENSION_REQUEST
+  COUNTRY_NAME: '2.5.4.6',
+  STATE_OR_PROVINCE_NAME: '2.5.4.8',
+  LOCALITY_NAME: '2.5.4.7',
+  ORGANIZATION_NAME: '2.5.4.10',
+  ORGANIZATIONAL_UNIT_NAME: '2.5.4.11',
+  COMMON_NAME: '2.5.4.3',
+  EMAIL_ADDRESS: `${pkcs9}1`,
+  UNSTRUCTURED_NAME: `${pkcs9}2`,
+  CHALLENGE_PASSWORD: `${pkcs9}7`,
+  EXTENSION_REQUEST: `${pkcs9}14`
 };
 
-const EXTN_ID = 'extnId';
-const CRITICAL = 'criticald';
-const EXTN_VALUE = 'extnValue';
-
-export const EXTN_LABELS = {
-  EXTN_ID,
-  CRITICAL,
-  EXTN_VALUE
+export const EXTN = {
+  ID: 'extnId',
+  CRITICAL: 'criticald',
+  VALUE: 'extnValue'
 };
 
 function encodePem(data, label) {
@@ -44,15 +29,15 @@ function encodePem(data, label) {
 
 function composeAttribute(companyData) {
   const attributesData = [];
-  if (OID_UNSTRUCTURED_NAME in companyData) {
+  if (OID.UNSTRUCTURED_NAME in companyData) {
     attributesData.push(
       new asn1js.Sequence({
         value: [
-          new asn1js.ObjectIdentifier({ value: OID_UNSTRUCTURED_NAME }),
+          new asn1js.ObjectIdentifier({ value: OID.UNSTRUCTURED_NAME }),
           new asn1js.Set({
             value: [
               new asn1js.Utf8String({
-                value: companyData[OID_UNSTRUCTURED_NAME]
+                value: companyData[OID.UNSTRUCTURED_NAME]
               })
             ]
           })
@@ -60,35 +45,35 @@ function composeAttribute(companyData) {
       })
     );
   }
-  if (OID_CHALLENGE_PASSWORD in companyData) {
+  if (OID.CHALLENGE_PASSWORD in companyData) {
     const expr = /^[-a-zA-Z0-9/:=,' ()+.?]*$/;
     let passwd;
-    if (companyData[OID_CHALLENGE_PASSWORD].match(expr)) {
-      passwd = new asn1js.PrintableString({ value: companyData[OID_CHALLENGE_PASSWORD] });
+    if (companyData[OID.CHALLENGE_PASSWORD].match(expr)) {
+      passwd = new asn1js.PrintableString({ value: companyData[OID.CHALLENGE_PASSWORD] });
     } else {
-      passwd = new asn1js.Utf8String({ value: companyData[OID_CHALLENGE_PASSWORD] });
+      passwd = new asn1js.Utf8String({ value: companyData[OID.CHALLENGE_PASSWORD] });
     }
     attributesData.push(
       new asn1js.Sequence({
         value: [
-          new asn1js.ObjectIdentifier({ value: OID_CHALLENGE_PASSWORD }),
+          new asn1js.ObjectIdentifier({ value: OID.CHALLENGE_PASSWORD }),
           new asn1js.Set({ value: [passwd] })
         ]
       })
     );
   }
-  if (OID_EXTENSION_REQUEST in companyData) {
+  if (OID.EXTENSION_REQUEST in companyData) {
     attributesData.push(
       new asn1js.Sequence({
         value: [
-          new asn1js.ObjectIdentifier({ value: OID_EXTENSION_REQUEST }),
+          new asn1js.ObjectIdentifier({ value: OID.EXTENSION_REQUEST }),
           new asn1js.Set({
             value:
-            companyData[OID_EXTENSION_REQUEST].map((entry) => new asn1js.Sequence({
+            companyData[OID.EXTENSION_REQUEST].map((entry) => new asn1js.Sequence({
               value: [
-                new asn1js.ObjectIdentifier({ value: entry[EXTN_ID] }),
-                new asn1js.Boolean({ value: entry[CRITICAL] }),
-                new asn1js.OctetString({ valueHex: entry[EXTN_VALUE] })
+                new asn1js.ObjectIdentifier({ value: entry[EXTN.ID] }),
+                new asn1js.Boolean({ value: entry[EXTN.CRITICAL] }),
+                new asn1js.OctetString({ valueHex: entry[EXTN.VALUE] })
               ]
             }))
           })
@@ -110,13 +95,13 @@ function composeAttribute(companyData) {
 
 function composeName(companyData) {
   const attrubuteType = {
-    [OID_COUNTRY_NAME]: asn1js.PrintableString,
-    [OID_STATE_OR_PROVINCE_NAME]: asn1js.Utf8String,
-    [OID_LOCALITY_NAME]: asn1js.Utf8String,
-    [OID_ORGANIZATION_NAME]: asn1js.Utf8String,
-    [OID_ORGANIZATIONAL_UNIT_NAME]: asn1js.Utf8String,
-    [OID_COMMON_NAME]: asn1js.Utf8String,
-    [OID_EMAIL_ADDRESS]: asn1js.IA5String
+    [OID.COUNTRY_NAME]: asn1js.PrintableString,
+    [OID.STATE_OR_PROVINCE_NAME]: asn1js.Utf8String,
+    [OID.LOCALITY_NAME]: asn1js.Utf8String,
+    [OID.ORGANIZATION_NAME]: asn1js.Utf8String,
+    [OID.ORGANIZATIONAL_UNIT_NAME]: asn1js.Utf8String,
+    [OID.COMMON_NAME]: asn1js.Utf8String,
+    [OID.EMAIL_ADDRESS]: asn1js.IA5String
   };
   const companyDataKeys = Object.keys(companyData).filter((oid) => oid in attrubuteType);
   const attributesArr = companyDataKeys.map((oid) => new asn1js.Set({
