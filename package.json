@@ -2,7 +2,7 @@
   "name": "certificate-request",
   "license": "MIT",
   "version": "1.0.0",
-  "description": "WWPass Frontend Request Library",
+  "description": "Frontend Certificate Request Library",
   "scripts": {
     "eslint": "eslint src/",
     "jest": "jest",
