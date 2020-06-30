@@ -118,39 +118,37 @@ function composeName(companyData) {
 }
 
 function encodeCSR(pubKey, privKey, companyData) {
-  return new Promise((resolve) => {
-    crypto.subtle.exportKey('spki', pubKey).then((spkiBin) => {
-      const SubjectPublicKeyInfo = asn1js.fromBER(spkiBin).result;
-      const CertificationRequestInfo = new asn1js.Sequence({
+  return crypto.subtle.exportKey('spki', pubKey).then((spkiBin) => {
+    const SubjectPublicKeyInfo = asn1js.fromBER(spkiBin).result;
+    const CertificationRequestInfo = new asn1js.Sequence({
+      value: [
+        new asn1js.Integer({ value: 0 }),
+        composeName(companyData),
+        SubjectPublicKeyInfo
+      ]
+    });
+
+    const attributes = composeAttribute(companyData);
+    if (attributes != null) {
+      CertificationRequestInfo.valueBlock.value.push(attributes);
+    }
+
+    const algorithm = new asn1js.Sequence({
+      value: [
+        new asn1js.ObjectIdentifier({ value: '1.2.840.113549.1.1.13' }),
+        new asn1js.Null()
+      ]
+    });
+
+    return crypto.subtle.sign('RSASSA-PKCS1-v1_5', privKey, CertificationRequestInfo.toBER(false)).then((Signature) => {
+      const CertificationRequest = new asn1js.Sequence({
         value: [
-          new asn1js.Integer({ value: 0 }),
-          composeName(companyData),
-          SubjectPublicKeyInfo
+          CertificationRequestInfo,
+          algorithm,
+          new asn1js.BitString({ valueHex: Signature })
         ]
       });
-
-      const attributes = composeAttribute(companyData);
-      if (attributes != null) {
-        CertificationRequestInfo.valueBlock.value.push(attributes);
-      }
-
-      const algorithm = new asn1js.Sequence({
-        value: [
-          new asn1js.ObjectIdentifier({ value: '1.2.840.113549.1.1.13' }),
-          new asn1js.Null()
-        ]
-      });
-
-      crypto.subtle.sign('RSASSA-PKCS1-v1_5', privKey, CertificationRequestInfo.toBER(false)).then((Signature) => {
-        const CertificationRequest = new asn1js.Sequence({
-          value: [
-            CertificationRequestInfo,
-            algorithm,
-            new asn1js.BitString({ valueHex: Signature })
-          ]
-        });
-        resolve(encodePem(CertificationRequest.toBER(false), 'CERTIFICATE REQUEST'));
-      });
+      return encodePem(CertificationRequest.toBER(false), 'CERTIFICATE REQUEST');
     });
   });
 }
@@ -163,17 +161,15 @@ export function generatePrivateKeyAndCSR(companyData) {
     hash: 'SHA-512'
   };
   const keyUsages = ['sign'];
-  return new Promise((resolve) => {
-    crypto.subtle.generateKey(keyGenParams, true, keyUsages).then((keyPair) => {
-      crypto.subtle.exportKey('pkcs8', keyPair.privateKey).then((privKeyBuf) => {
-        const privateKeyPEM = encodePem(privKeyBuf, 'PRIVATE KEY');
-        encodeCSR(keyPair.publicKey, keyPair.privateKey, companyData).then((CSR_PEM) => {
-          resolve({
-            CSR_PEM,
-            privateKeyPEM
-          });
-        });
-      });
+  return crypto.subtle.generateKey(keyGenParams, true, keyUsages).then((keyPair) => {
+    return crypto.subtle.exportKey('pkcs8', keyPair.privateKey).then((privKeyBuf) => {
+      const privateKeyPEM = encodePem(privKeyBuf, 'PRIVATE KEY');
+      return encodeCSR(keyPair.publicKey, keyPair.privateKey, companyData).then((CSR_PEM) => (
+        {
+          CSR_PEM,
+          privateKeyPEM
+        }
+      ));
     });
   });
 }

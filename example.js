@@ -10,7 +10,7 @@ function addToPage(text){
 const companyData = {
   [PEM.OID.COMMON_NAME]: "*.example.org",
   [PEM.OID.ORGANIZATION_NAME]: "Example Corp.",
-  [PEM.OID.EMAIL_ADDRESS]: "example@example.org"
+  [PEM.OID.EMAIL_ADDRESS]: "example@example.org",
   [PEM.OID.ORGANIZATIONAL_UNIT_NAME]: "Finance",
   [PEM.OID.LOCALITY_NAME]: "San Francisco",
   [PEM.OID.STATE_OR_PROVINCE_NAME]: "California",
