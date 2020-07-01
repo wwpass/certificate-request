@@ -26,5 +26,5 @@ const companyData = {
 };
 const result = PEM.generate(companyData);
 ```
-This function returns a Promise that fulfills in an object with properties CSR_PEM and privateKeyPEM. The values of these properties are strings in PEM format.
+This function returns a Promise that fulfills in an object with properties certificateRequestPEM and privateKeyPEM. The values of these properties are strings in PEM format.
 More complete example with usage of all possible fields of companyData is in example.js

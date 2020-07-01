@@ -32,6 +32,6 @@ const companyData = {
   [PEM.OID.UNSTRUCTURED_NAME]: "Some Name"
 };
 PEM.generate(companyData).then(result => {
-  addToPage(result.CSR_PEM);
+  addToPage(result.certificateRequestPEM);
   addToPage(result.privateKeyPEM);
 });

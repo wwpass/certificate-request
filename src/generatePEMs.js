@@ -163,9 +163,9 @@ export function generatePrivateKeyAndCSR(companyData) {
   const keyUsages = ['sign'];
   return crypto.subtle.generateKey(keyGenParams, true, keyUsages).then((keyPair) => crypto.subtle.exportKey('pkcs8', keyPair.privateKey).then((privKeyBuf) => {
     const privateKeyPEM = encodePem(privKeyBuf, 'PRIVATE KEY');
-    return encodeCSR(keyPair.publicKey, keyPair.privateKey, companyData).then((CSR_PEM) => (
+    return encodeCSR(keyPair.publicKey, keyPair.privateKey, companyData).then((certificateRequestPEM) => (
       {
-        CSR_PEM,
+        certificateRequestPEM,
         privateKeyPEM
       }
     ));
