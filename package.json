@@ -37,7 +37,7 @@
     "eslint-plugin-react-hooks": "1.7.0",
     "jest": "24.9.0",
     "regenerator-runtime": "0.12.1",
-    "rollup": "1.32.1",
+    "rollup": "3.29.5",
     "rollup-plugin-babel": "4.4.0",
     "rollup-plugin-commonjs": "9.3.4",
     "rollup-plugin-eslint": "7.0.0",
